@@ -7,6 +7,7 @@ package edu.eci.arsw.blacklistvalidator;
 
 import java.util.List;
 import edu.eci.arsw.threads.CountThread;
+import edu.eci.arsw.threads.ThreadSearch;
 import edu.eci.arsw.threads.CountThread;
 
 /**
@@ -16,14 +17,26 @@ import edu.eci.arsw.threads.CountThread;
 public class Main {
     public int a;
     public int d;
-    public static void main(String a[]){
+    public static void main(String a[])throws InterruptedException{
         HostBlackListsValidator hblv=new HostBlackListsValidator();
-        List<Integer> blackListOcurrences=hblv.checkHost("200.24.24.55");
+        List<Integer> blackListOcurrences=hblv.checkHost("200.24.34.55");
         System.out.println("The host was found in the following blacklists:"+blackListOcurrences);
 
-        //ejercicio punto 1
+        // ejercicio punto 1
         counter(1,10);
+
+        // ejercicio 1 punto 2
+        ThreadSearch encontrado = new ThreadSearch(1, 4000, "200.24.34.55");
+        
+        encontrado.start();
+        encontrado.join();
+
+        System.out.println();
+        System.out.println("++++++++++ Parte 2 ++++++++++");
+        System.out.println("Total ocurrencias encontradas: " + encontrado.getOcurrencias());
+
     }
+
     public static void counter(int a,int d){
         int b=d/3;
         int c=2*b;
@@ -33,6 +46,8 @@ public class Main {
         Hilo1.start();
         Hilo2.start();
         Hilo3.start();
+
+        
     }
 
 }

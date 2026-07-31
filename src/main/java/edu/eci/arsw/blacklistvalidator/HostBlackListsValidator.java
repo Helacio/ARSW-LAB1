@@ -6,6 +6,7 @@
 package edu.eci.arsw.blacklistvalidator;
 
 import edu.eci.arsw.spamkeywordsdatasource.HostBlacklistsDataSourceFacade;
+import edu.eci.arsw.threads.ThreadSearch;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
