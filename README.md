@@ -20,8 +20,10 @@
 	1. Cree 3 hilos de tipo CountThread, asignándole al primero el intervalo [0..99], al segundo [99..199], y al tercero [200..299].
 	2. Inicie los tres hilos con 'start()'.
 	3. Ejecute y revise la salida por pantalla. 
+	Se observa que los hilos escriben los numeros en desorden, debido a que se ejecutan en paralelo y el primero en imprimir puede ser cualquiera de ellos.
 	4. Cambie el incio con 'start()' por 'run()'. Cómo cambia la salida?, por qué?.
-
+		![Captura de pantalla del resultado](img/captura-de-pantalla.png)
+	cambia porque no se crean hilos, el hilo principal es el que ejecuta los metodos paso por paso y no en paralelo 
 **Parte II - Ejercicio Black List Search**
 
 
@@ -85,5 +87,8 @@ Con lo anterior, y con los tiempos de ejecución dados, haga una gráfica de tie
 
 3. De acuerdo con lo anterior, si para este problema en lugar de 100 hilos en una sola CPU se pudiera usar 1 hilo en cada una de 100 máquinas hipotéticas, la ley de Amdahls se aplicaría mejor?. Si en lugar de esto se usaran c hilos en 100/c máquinas distribuidas (siendo c es el número de núcleos de dichas máquinas), se mejoraría?. Explique su respuesta.
 
+
+Nombres:
+Hernan Sanchez,Juan David Rangel
 
 

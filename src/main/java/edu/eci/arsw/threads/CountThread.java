@@ -9,7 +9,7 @@ package edu.eci.arsw.threads;
  *
  * @author hcadavid
  */
-public class CountThread implements Runnable{
+public class CountThread extends Thread{
     private final int a;
     private final int b;
 
