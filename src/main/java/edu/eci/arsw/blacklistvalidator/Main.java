@@ -17,9 +17,9 @@ public class Main {
     public int a;
     public int d;
     public static void main(String a[]){
-        //HostBlackListsValidator hblv=new HostBlackListsValidator();
-        //List<Integer> blackListOcurrences=hblv.checkHost("200.24.34.55");
-        //System.out.println("The host was found in the following blacklists:"+blackListOcurrences);
+        HostBlackListsValidator hblv=new HostBlackListsValidator();
+        List<Integer> blackListOcurrences=hblv.checkHost("200.24.24.55");
+        System.out.println("The host was found in the following blacklists:"+blackListOcurrences);
 
         //ejercicio punto 1
         counter(1,10);
@@ -34,7 +34,5 @@ public class Main {
         Hilo2.start();
         Hilo3.start();
     }
-
-    
 
 }
