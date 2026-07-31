@@ -14,15 +14,24 @@ import edu.eci.arsw.threads.CountThread;
  * @author hcadavid
  */
 public class Main {
-    
+    public int a;
+    public int d;
     public static void main(String a[]){
         //HostBlackListsValidator hblv=new HostBlackListsValidator();
         //List<Integer> blackListOcurrences=hblv.checkHost("200.24.34.55");
         //System.out.println("The host was found in the following blacklists:"+blackListOcurrences);
-
-        //
-        Thread Hilo=new Thread(new CountThread(3, 6));
-        Hilo.start();
+        counter(1,10);
     }
+    public static void counter(int a,int d){
+        int b=d/3;
+        int c=2*b;
+        Thread Hilo1=new Thread(new CountThread(a, b));
+        Thread Hilo2=new Thread(new CountThread(b, c));
+        Thread Hilo3=new Thread(new CountThread(c, d));
+        Hilo1.start();
+        Hilo2.start();
+        Hilo3.start();
+    }
+
     
 }
