@@ -17,10 +17,10 @@ public class Main {
     public int a;
     public int d;
     public static void main(String a[]){
-        //HostBlackListsValidator hblv=new HostBlackListsValidator();
-        //List<Integer> blackListOcurrences=hblv.checkHost("200.24.34.55");
-        //System.out.println("The host was found in the following blacklists:"+blackListOcurrences);
-        counter(1,10);
+        HostBlackListsValidator hblv=new HostBlackListsValidator();
+        List<Integer> blackListOcurrences=hblv.checkHost("200.24.34.55");
+        System.out.println("The host was found in the following blacklists:"+blackListOcurrences);
+        //counter(1,10);
     }
     public static void counter(int a,int d){
         int b=d/3;
