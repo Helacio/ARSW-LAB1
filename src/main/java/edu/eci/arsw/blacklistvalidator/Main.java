@@ -20,6 +20,8 @@ public class Main {
         //HostBlackListsValidator hblv=new HostBlackListsValidator();
         //List<Integer> blackListOcurrences=hblv.checkHost("200.24.34.55");
         //System.out.println("The host was found in the following blacklists:"+blackListOcurrences);
+
+        //ejercicio punto 1
         counter(1,10);
     }
     public static void counter(int a,int d){
