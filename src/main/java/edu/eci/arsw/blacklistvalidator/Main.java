@@ -26,8 +26,8 @@ public class Main {
         int b=d/3;
         int c=2*b;
         Thread Hilo1=new Thread(new CountThread(a, b));
-        Thread Hilo2=new Thread(new CountThread(b, c));
-        Thread Hilo3=new Thread(new CountThread(c, d));
+        Thread Hilo2=new Thread(new CountThread(b+1, c));
+        Thread Hilo3=new Thread(new CountThread(c+1, d));
         Hilo1.start();
         Hilo2.start();
         Hilo3.start();

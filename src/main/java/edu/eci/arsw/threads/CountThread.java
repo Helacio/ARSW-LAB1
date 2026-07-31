@@ -21,7 +21,7 @@ public class CountThread implements Runnable{
 
 
     public void Counter(int a,int b){
-        for(int i=a;i<b;i++){
+        for(int i=a;i<=b;i++){
             System.out.println(i);
         }
     }
