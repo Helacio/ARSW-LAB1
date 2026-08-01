@@ -32,8 +32,16 @@ public class Main {
         encontrado.join();
 
         System.out.println();
-        System.out.println("++++++++++ Parte 2 ++++++++++");
+        System.out.println("++++++++++ Parte 2 Ejercicio 1 ++++++++++");
         System.out.println("Total ocurrencias encontradas: " + encontrado.getOcurrencias());
+
+
+        // ejercicio 2 punto 2
+        System.out.println();
+        System.out.println("++++++++++ Parte 2 Ejercicio 2 ++++++++++");
+
+        List<Integer> blackListOcurrences2 = hblv.checkHost("200.24.34.55", 50);
+        System.out.println("The host was found in the following blacklists:" + blackListOcurrences2);
 
     }
 

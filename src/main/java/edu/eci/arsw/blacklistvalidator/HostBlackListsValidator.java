@@ -63,6 +63,59 @@ public class HostBlackListsValidator {
         return blackListOcurrences;
     }
     
+
+    public List<Integer> checkHost(String ipaddress, int n){
+        
+        LinkedList<Integer> blackListOcurrences=new LinkedList<>();
+        
+        HostBlacklistsDataSourceFacade skds=HostBlacklistsDataSourceFacade.getInstance();
+
+        int total = skds.getRegisteredServersCount();
+        int residuo = total %n;
+        int base = total /n;
+
+        int inicio=0;
+
+        ThreadSearch[] hilos = new ThreadSearch[n];
+
+        for (int j = 0; j < n; j++) {
+            int cantidad = base + (j< residuo ? 1 : 0);
+            int fin = inicio + cantidad -1;
+
+            hilos[j] = new ThreadSearch(inicio, fin, ipaddress);
+            inicio += cantidad;
+        }
+        
+        for(int i =0; i < n; i ++){
+            hilos[i].start();
+        }
+
+        for(int i = 0; i < n; i++){
+            try{
+                hilos[i].join();
+            } catch(InterruptedException e){
+                LOG.log(Level.SEVERE, "Error en el hilo: " + e.getMessage(), e);
+            }
+        }
+
+        int ocurrencesCount = 0;
+        int checkedListsCount=0;
+        for(int i =0; i < n; i ++){
+            blackListOcurrences.addAll(hilos[i].getListas());
+            ocurrencesCount += hilos[i].getOcurrencias();
+            checkedListsCount += hilos[i].getRevisadas();
+        }
+
+        if (ocurrencesCount>=BLACK_LIST_ALARM_COUNT){
+            skds.reportAsNotTrustworthy(ipaddress);
+        }
+        else{
+            skds.reportAsTrustworthy(ipaddress);
+        }
+
+        return blackListOcurrences;
+    }
+
     
     private static final Logger LOG = Logger.getLogger(HostBlackListsValidator.class.getName());
     
