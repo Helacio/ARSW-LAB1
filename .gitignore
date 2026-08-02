@@ -5,3 +5,6 @@ alt/
 atl/
 .atl
 .alt
+
+# Scratch files (never pushed)
+src/main/java/edu/eci/arsw/blacklistvalidator/ExecutorPlayground.java

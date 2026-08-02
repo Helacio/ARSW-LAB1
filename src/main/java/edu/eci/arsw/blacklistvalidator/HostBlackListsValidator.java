@@ -113,6 +113,9 @@ public class HostBlackListsValidator {
             skds.reportAsTrustworthy(ipaddress);
         }
 
+        LOG.log(Level.INFO, "Checked Black Lists:{0} of {1}",
+                new Object[]{checkedListsCount, skds.getRegisteredServersCount()});
+
         return blackListOcurrences;
     }
 

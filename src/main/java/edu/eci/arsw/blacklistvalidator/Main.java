@@ -22,7 +22,10 @@ public class Main {
         List<Integer> blackListOcurrences=hblv.checkHost("200.24.34.55");
         System.out.println("The host was found in the following blacklists:"+blackListOcurrences);
 
-        // ejercicio punto 1
+        // ejercicio punto 1 
+        /*
+        Dado un rango, este se divide 3 hilos y posteriormente se llaman.
+        */
         counter(1,10);
 
         // ejercicio 1 punto 2
@@ -45,12 +48,14 @@ public class Main {
 
     }
 
+
+
     public static void counter(int a,int d){
         int b=d/3;
         int c=2*b;
-        Thread Hilo1=new Thread(new CountThread(a, b));
-        Thread Hilo2=new Thread(new CountThread(b+1, c));
-        Thread Hilo3=new Thread(new CountThread(c+1, d));
+        Thread Hilo1=new CountThread(a, b);
+        Thread Hilo2=new CountThread(b+1, c);
+        Thread Hilo3=new CountThread(c+1, d);
         Hilo1.start();
         Hilo2.start();
         Hilo3.start();

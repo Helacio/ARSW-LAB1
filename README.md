@@ -112,6 +112,75 @@ Se hace uso de ```.join``` para que podamos imprimir el resultado de las ocurren
 
 	* Se sabe que el HOST 202.24.34.55 está reportado en listas negras de una forma más dispersa, y que el host 212.24.24.55 NO está en ninguna lista negra.
 
+Código implementado:
+
+```
+public List<Integer> checkHost(String ipaddress, int n){
+        
+    LinkedList<Integer> blackListOcurrences=new LinkedList<>();
+    
+    HostBlacklistsDataSourceFacade skds=HostBlacklistsDataSourceFacade.getInstance();
+
+    int total = skds.getRegisteredServersCount();
+    int residuo = total %n;
+    int base = total /n;
+
+    int inicio=0;
+
+    ThreadSearch[] hilos = new ThreadSearch[n];
+
+    for (int j = 0; j < n; j++) {
+        int cantidad = base + (j< residuo ? 1 : 0);
+        int fin = inicio + cantidad -1;
+
+        hilos[j] = new ThreadSearch(inicio, fin, ipaddress);
+        inicio += cantidad;
+    }
+    
+    for(int i =0; i < n; i ++){
+        hilos[i].start();
+    }
+
+    for(int i = 0; i < n; i++){
+        try{
+            hilos[i].join();
+        } catch(InterruptedException e){
+            LOG.log(Level.SEVERE, "Error en el hilo: " + e.getMessage(), e);
+        }
+    }
+
+    int ocurrencesCount = 0;
+    int checkedListsCount=0;
+    for(int i =0; i < n; i ++){
+        blackListOcurrences.addAll(hilos[i].getListas());
+        ocurrencesCount += hilos[i].getOcurrencias();
+        checkedListsCount += hilos[i].getRevisadas();
+    }
+
+    if (ocurrencesCount>=BLACK_LIST_ALARM_COUNT){
+        skds.reportAsNotTrustworthy(ipaddress);
+    }
+    else{
+        skds.reportAsTrustworthy(ipaddress);
+    }
+
+    LOG.log(Level.INFO, "Checked Black Lists:{0} of {1}",
+            new Object[]{checkedListsCount, skds.getRegisteredServersCount()});
+
+    return blackListOcurrences;
+}
+```
+
+Se divide el espacio de búsqueda en N segmentos usando `base = total/n` y `residuo = total%n`, lo que permite manejar N par o impar sin dejar listas sin revisar ni revisar dos veces la misma. Cada hilo recorre un segmento, se espera con `join()` a que todos terminen, y se agregan las ocurrencias encontradas por cada hilo a la lista que retorna el método. El LOG final es verídico bajo el esquema paralelo porque la partición reparte cada lista negra a exactamente un hilo: la suma de las listas revisadas por los hilos es el total real de consultas realizadas.
+
+**Resultado del codigo:**
+
+```
+INFO: HOST 200.24.34.55 Reported as NOT trustworthy
+INFO: Checked Black Lists:80.000 of 80.000
+The host was found in the following blacklists:[23, 50, 200, 500, 1000]
+```
+
 
 **Parte II.I Para discutir la próxima clase (NO para implementar aún)**
 
@@ -137,9 +206,25 @@ Con lo anterior, y con los tiempos de ejecución dados, haga una gráfica de tie
 
 	![](img/ahmdahls.png), donde _S(n)_ es el mejoramiento teórico del desempeño, _P_ la fracción paralelizable del algoritmo, y _n_ el número de hilos, a mayor _n_, mayor debería ser dicha mejora. Por qué el mejor desempeño no se logra con los 500 hilos?, cómo se compara este desempeño cuando se usan 200?. 
 
+El mejor desempeño no se logra con 500 hilos porque la ley de Amdahl asume un costo de coordinación nulo, pero en la práctica cada hilo adicional agrega overhead: creación y memoria (~1MB de pila por hilo), cambio de contexto cuando hay más hilos que núcleos, y contención sobre los recursos compartidos. Ese overhead crece con el número de hilos, por lo que el rendimiento tiene un punto óptimo y luego cae. Por eso 200 hilos rinden más que 500: se mantiene una sobre-suscripción suficiente para cubrir la latencia de las consultas, sin saturar al planificador. Más hilos no significan mejora cuando el tiempo que el sistema gasta en crear e intercambiar hilos supera al tiempo que los hilos ahorran al paralelizar el trabajo.
+
+
 2. Cómo se comporta la solución usando tantos hilos de procesamiento como núcleos comparado con el resultado de usar el doble de éste?.
 
+Respuesta corta: con el doble de hilos que núcleos se obtiene casi el doble de rendimiento cuando la carga es de latencia, porque el cuello de botella no es la CPU sino la espera de las respuestas.
+Tu dato lo muestra perfecto:
+- 16 hilos (núcleos): 7.678 ms
+- 32 hilos (doble): 3.813 ms ← la mitad exacta
+
+Las mediciones se realizaron sobre la implementación entregada en la Parte II, sin el corte temprano de la Parte II.I (que el enunciado indica solo para discusión). Por eso cada experimento recorre las 80.000 listas completas, y el LOG muestra siempre "Checked Black Lists:80.000 of 80.000".
+
+También hay que tener en cuenta que si la tarea fuera CPU pura (cálculo matemático), el doble de hilos no mejoraría, porque los núcleos ya estarían saturados y solo sumaría contexto switching. Que al duplicar los hilos el tiempo baje a la mitad (de 7.678 ms a 3.813 ms) confirma que la carga es de latencia: los hilos pasan la mayor parte del tiempo esperando la respuesta de las consultas, no calculando.
+
 3. De acuerdo con lo anterior, si para este problema en lugar de 100 hilos en una sola CPU se pudiera usar 1 hilo en cada una de 100 máquinas hipotéticas, la ley de Amdahls se aplicaría mejor?. Si en lugar de esto se usaran c hilos en 100/c máquinas distribuidas (siendo c es el número de núcleos de dichas máquinas), se mejoraría?. Explique su respuesta.
+
+La ley de Amdahl se aplicaría mejor con 100 máquinas y 1 hilo cada una, siempre que los datos estén distribuidos (cada máquina consulta su propia copia de listas negras): desaparecen el context switching, la contención sobre el heap y el singleton compartido, y el límite de Amdahl se acerca al valor teórico S(100).
+
+La opción de c hilos en 100/c máquinas mejora aún más, porque mantiene 100 hilos activos (cubriendo la latencia de las consultas) pero cada uno en un núcleo propio, sin sobre-suscripción ni intercambio de contexto — es el mismo grado de paralelismo, con el overhead de coordinación reducido al mínimo. La ley de Amdahl no cambia: lo que cambia es que el overhead real se achica hasta acercarse al modelo ideal que ella asume.
 
 
 Nombres:
