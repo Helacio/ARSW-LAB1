@@ -15,12 +15,12 @@ public class PartIIIExperiment {
         int cores = Runtime.getRuntime().availableProcessors();
         HostBlackListsValidator validator = new HostBlackListsValidator();
 
-        int[] sizes = {1, cores, cores * 2, 50, 100};
+        int[] sizes = {cores, cores * 2, 50, 100, 10000, 50000};
         for (int n : sizes) {
             long start = System.currentTimeMillis();
             List<Integer> found = validator.checkHost(ip, n);
             long ms = System.currentTimeMillis() - start;
-            System.out.printf("%d,%d,%d%n", n, ms, found.size());
+            System.out.printf("Hilos: %d, Tiempo: %d ms, Ocurrencias: %d%n", n, ms, found.size());
             System.out.println("  -> lists: " + found);
         }
     }

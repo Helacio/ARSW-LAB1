@@ -190,15 +190,48 @@ La estrategia de paralelismo antes implementada es ineficiente en ciertos casos,
 
 A partir de lo anterior, implemente la siguiente secuencia de experimentos para realizar las validación de direcciones IP dispersas (por ejemplo 202.24.34.55), tomando los tiempos de ejecución de los mismos (asegúrese de hacerlos en la misma máquina):
 
+
+Obtuvimos el siguiente resultado:
+
 1. Un solo hilo.
+
+Hilos: 1, Tiempo: 124518 ms, Ocurrencias: 5
+
 2. Tantos hilos como núcleos de procesamiento (haga que el programa determine esto haciendo uso del [API Runtime](https://docs.oracle.com/javase/7/docs/api/java/lang/Runtime.html)).
+
+
+Hilos: 12, Tiempo: 10353 ms, Ocurrencias: 5
+
 3. Tantos hilos como el doble de núcleos de procesamiento.
+
+Hilos: 24, Tiempo: 5219 ms, Ocurrencias: 5
+
+
 4. 50 hilos.
+
+Hilos: 50, Tiempo: 2356 ms, Ocurrencias: 5
+
 5. 100 hilos.
+
+Hilos: 100, Tiempo: 1173 ms, Ocurrencias: 5
 
 Al iniciar el programa ejecute el monitor jVisualVM, y a medida que corran las pruebas, revise y anote el consumo de CPU y de memoria en cada caso. ![](img/jvisualvm.png)
 
+El monitoreo del programa que emula los 5 puntos anteriores se muestra:
+
+![Monitoreo threads](img/MonitoreoThreadsLab1.png)
+
 Con lo anterior, y con los tiempos de ejecución dados, haga una gráfica de tiempo de solución vs. número de hilos. Analice y plantee hipótesis con su compañero para las siguientes preguntas (puede tener en cuenta lo reportado por jVisualVM):
+
+![Gráfica Tiempo VS Hilos](img/parte3_grafica.png)
+
+
+**Hipotesis:**
+
+Existe un punto óptimo de hilos, no mientras más mejor
+
+La curva tiene forma de U: mejora sin parar hasta 10.000 hilos (786 ms), pero en 50.000 vuelve a subir a 4.406 ms. Esto pasa porque el trabajo total es fijo (80.000 listas), así que entre más hilos se crean, menos le toca hacer a cada uno, y en algún punto crear y agendar el hilo cuesta más que el trabajo que ese hilo realmente hace. Ahí el overhead empieza a ganarle al paralelismo. Habría que probar con valores intermedios (15.000, 20.000, 30.000) para ubicar mejor ese punto óptimo.
+
 
 **Parte IV - Ejercicio Black List Search**
 
