@@ -186,6 +186,8 @@ The host was found in the following blacklists:[23, 50, 200, 500, 1000]
 
 La estrategia de paralelismo antes implementada es ineficiente en ciertos casos, pues la búsqueda se sigue realizando aún cuando los N hilos (en su conjunto) ya hayan encontrado el número mínimo de ocurrencias requeridas para reportar al servidor como malicioso. Cómo se podría modificar la implementación para minimizar el número de consultas en estos casos?, qué elemento nuevo traería esto al problema?
 
+Se agregaría un contador compartido (por ejemplo, AtomicInteger) que todos los hilos actualizan y consultan; al llegar a 5 ocurrencias, se activa una bandera o se interrumpen los hilos para que paren antes de terminar su segmento. El elemento nuevo es estado compartido entre hilos, lo que obliga a sincronizar (evitar condiciones de carrera, termino mencionado en clase) y agrega overhead y no determinismo, cosa que antes no existía porque cada hilo trabajaba aislado.
+
 **Parte III - Evaluación de Desempeño**
 
 A partir de lo anterior, implemente la siguiente secuencia de experimentos para realizar las validación de direcciones IP dispersas (por ejemplo 202.24.34.55), tomando los tiempos de ejecución de los mismos (asegúrese de hacerlos en la misma máquina):
